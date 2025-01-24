@@ -1,3 +1,9 @@
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -16,6 +22,27 @@ public class apkPerhitunganHari extends javax.swing.JFrame {
     public apkPerhitunganHari() {
         initComponents();
     }
+    
+    private String getNamaHariIndonesia(java.time.DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
+            case MONDAY:
+                return "Senin";
+            case TUESDAY:
+                return "Selasa";
+            case WEDNESDAY:
+                return "Rabu";
+            case THURSDAY:
+                return "Kamis";
+            case FRIDAY:
+                return "Jumat";
+            case SATURDAY:
+                return "Sabtu";
+            case SUNDAY:
+                return "Minggu";
+            default:
+                return "";
+        }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -52,8 +79,18 @@ public class apkPerhitunganHari extends javax.swing.JFrame {
         jLabel2.setText("Masukkan Tahun");
 
         jButton1.setText("Hitung hari");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Hapus");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Jumlah hari:");
 
@@ -66,10 +103,27 @@ public class apkPerhitunganHari extends javax.swing.JFrame {
         jLabel7.setText("Tahun Kabisat: ");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
 
         jLabel8.setText("Pilih tanggal awal");
 
         jLabel9.setText("Pilih tanggal akhir");
+
+        jCalendar1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jCalendar1PropertyChange(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -165,6 +219,93 @@ public class apkPerhitunganHari extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int tahun = (int) jSpinner1.getValue();
+        if (String.valueOf(tahun).length() != 4) {
+            JOptionPane.showMessageDialog(this, "Tahun harus terdiri dari 4 digit", "Input Tidak Valid", JOptionPane.ERROR_MESSAGE);
+            return; 
+        }
+        int bulan = jComboBox1.getSelectedIndex() + 1;
+
+        LocalDate date = LocalDate.of(tahun, bulan, 1);
+        int daysInMonth = date.lengthOfMonth();
+        boolean isLeapYear = date.isLeapYear();
+
+        String hasil = "Jumlah Hari : " + daysInMonth;
+        if (bulan == 2 && isLeapYear) {
+            hasil += " (Tahun Kabisat)";
+        }
+
+        LocalDate firstDay = date.withDayOfMonth(1);
+        LocalDate lastDay = date.withDayOfMonth(daysInMonth);
+        jLabel3.setText("Jumlah Hari : " + daysInMonth);
+        jLabel7.setText("Tahun Kabisat: " + (isLeapYear ? "Ya" : "Tidak"));
+
+        LocalDate startDate = jCalendar1.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate = jCalendar2.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        jLabel6.setText("Selisih Hari : " + daysBetween);
+
+        jLabel4.setText("Hari Pertama: " + getNamaHariIndonesia(firstDay.getDayOfWeek()));
+        jLabel5.setText("Hari Terakhir: " + getNamaHariIndonesia(lastDay.getDayOfWeek()));
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        jComboBox1.setSelectedIndex(0);
+        jSpinner1.setValue(0); 
+        jCalendar2.setDate(new java.util.Date()); 
+        jLabel3.setText("Jumlah Hari : ");
+        jLabel4.setText("Hari Pertama : ");
+        jLabel5.setText("Hari Terakhir : ");
+        jLabel6.setText("Selisih Hari : ");
+        jLabel7.setText("Tahun Kabisat:");
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jCalendar1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jCalendar1PropertyChange
+        // TODO add your handling code here:
+        LocalDate selectedDate = jCalendar1.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        
+        // Dapatkan bulan dari selectedDate, dan pastikan dalam rentang 0-11
+        int monthIndex = selectedDate.getMonthValue() - 1;
+        if (monthIndex >= 0 && monthIndex <= 11) {
+            jComboBox1.setSelectedIndex(monthIndex);
+        }
+        
+        jSpinner1.setValue(selectedDate.getYear());
+    }//GEN-LAST:event_jCalendar1PropertyChange
+
+    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
+        // TODO add your handling code here:
+        int tahun = (int) jSpinner1.getValue();
+    
+    // Ambil tanggal saat ini dari calendarAwal dan perbarui tahun
+    LocalDate currentLocalDate = jCalendar1.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    LocalDate updatedLocalDate = LocalDate.of(tahun, currentLocalDate.getMonthValue(), currentLocalDate.getDayOfMonth());
+    
+    // Set tanggal yang diperbarui ke kedua kalender
+    jCalendar1.setDate(java.util.Date.from(updatedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    jCalendar2.setDate(java.util.Date.from(updatedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }//GEN-LAST:event_jSpinner1StateChanged
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+        int tahun = (int) jSpinner1.getValue();
+    int bulan = jComboBox1.getSelectedIndex() + 1; // Bulan dari JComboBox (1 untuk Januari, 12 untuk Desember)
+    
+    // Ambil hari saat ini dari calendarAwal
+    LocalDate currentLocalDate = jCalendar1.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    int hari = Math.min(currentLocalDate.getDayOfMonth(), LocalDate.of(tahun, bulan, 1).lengthOfMonth());
+
+    // Buat tanggal baru dengan bulan dan tahun yang diperbarui
+    LocalDate updatedLocalDate = LocalDate.of(tahun, bulan, hari);
+    
+    // Set tanggal yang diperbarui ke kedua kalender
+    jCalendar1.setDate(java.util.Date.from(updatedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    jCalendar2.setDate(java.util.Date.from(updatedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
