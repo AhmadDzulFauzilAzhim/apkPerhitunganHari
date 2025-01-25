@@ -57,4 +57,4 @@ Ahmad Dzul Fauzil Azhim - 2210010389
 
 ## Demo
 
-
+![App Screenshot](https://github.com/AhmadDzulFauzilAzhim/apkPerhitunganHari/blob/main/img/demo%20aplikasi%20penghitung%20hari.gif)
